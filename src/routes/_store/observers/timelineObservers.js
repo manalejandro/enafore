@@ -1,6 +1,7 @@
 import { updateInstanceInfo } from '../../_actions/instances.js'
 import { createStream } from '../../_actions/stream/streaming.js'
 import { store } from '../store.js'
+import { basename } from '../../_api/utils.js'
 
 export function timelineObservers () {
   // stream to watch for local/federated/etc. updates. home and notification
@@ -65,7 +66,7 @@ export function timelineObservers () {
       streamingApi = currentInstanceInfo.urls.streaming_api
     } else {
       // Fallback: construct streaming URL from instance URL
-      streamingApi = currentInstance.replace(/^http/, 'ws')
+      streamingApi = basename(currentInstance).replace(/^http/, 'ws')
     }
 
     currentTimelineStream = createStream(streamingApi, currentInstance, accessToken,

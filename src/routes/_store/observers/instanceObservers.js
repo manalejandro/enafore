@@ -8,6 +8,7 @@ import { mark, stop } from '../../_utils/marks.js'
 import { store } from '../store.js'
 import { updateFollowRequestCountIfLockedAccount } from '../../_actions/followRequests.js'
 import { setupFiltersForInstance } from '../../_actions/filters.js'
+import { basename } from '../../_api/utils.js'
 
 // stream to watch for home timeline updates and notifications
 let currentInstanceStream
@@ -69,7 +70,7 @@ function stream (store, instanceName, currentInstanceInfo) {
     streamingApi = currentInstanceInfo.urls.streaming_api
   } else {
     // Fallback: construct streaming URL from instance URL
-    streamingApi = instanceName.replace(/^http/, 'ws')
+    streamingApi = basename(instanceName).replace(/^http/, 'ws')
   }
   const firstStatusId = store.getFirstTimelineItemId(instanceName, 'home')
   const firstNotificationId = store.getFirstTimelineItemId(instanceName, 'notifications')
