@@ -17,10 +17,17 @@
       <input type="checkbox"
              id="push-notifications-{option.key}"
              name="{option.key}"
-             disabled="{!pushNotificationsSupport}"
-             on:change="onPushSettingsChange(event)">
+             disabled="{!pushNotificationsSupport}">
       <label for="push-notifications-{option.key}">{option.label}</label>
     {/each}
+    <div class="save-button-wrapper">
+      <button type="button"
+              class="primary"
+              disabled="{!pushNotificationsSupport || saving}"
+              on:click="onSaveClick()">
+        {saving ? 'intl.saving' : 'intl.save'}
+      </button>
+    </div>
   </form>
 </div>
 <GenericInstanceSettingsStyle/>
@@ -30,6 +37,9 @@
   }
   p {
     margin: 0 0 10px 0;
+  }
+  .save-button-wrapper {
+    margin-top: 20px;
   }
 </style>
 <script>
@@ -56,6 +66,7 @@
     },
     store: () => store,
     data: () => ({
+      saving: false,
       options: [
         {
           key: 'follow',
@@ -87,7 +98,7 @@
       pushNotificationsSupport: ({ $pushNotificationsSupport }) => $pushNotificationsSupport
     },
     methods: {
-      async onPushSettingsChange (e) {
+      async onSaveClick () {
         const { instanceName, options } = this.get()
         const { form } = this.refs
         const alerts = {}
@@ -96,12 +107,12 @@
           alerts[key] = form.elements[key].checked
         }
 
+        this.set({ saving: true })
+
         try {
           await updateAlerts(instanceName, alerts)
           toast.say(formatIntl('intl.savedPushSettings'))
         } catch (err) {
-          e.target.checked = !e.target.checked
-
           // TODO: Better way to detect missing authorization scope
           if (err.message.startsWith('403:')) {
             const showTextConfirmationDialog = await importShowTextConfirmationDialog()
@@ -115,6 +126,8 @@
               error: err.message || ''
             }))
           }
+        } finally {
+          this.set({ saving: false })
         }
       }
     },
