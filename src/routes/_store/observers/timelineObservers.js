@@ -61,8 +61,11 @@ export function timelineObservers () {
     let streamingApi
     if (currentInstanceInfo?.configuration?.urls?.streaming) {
       streamingApi = currentInstanceInfo.configuration.urls.streaming
-    } else {
+    } else if (currentInstanceInfo?.urls?.streaming_api) {
       streamingApi = currentInstanceInfo.urls.streaming_api
+    } else {
+      // Fallback: construct streaming URL from instance URL
+      streamingApi = currentInstance.replace(/^http/, 'ws')
     }
 
     currentTimelineStream = createStream(streamingApi, currentInstance, accessToken,
