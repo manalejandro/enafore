@@ -663,6 +663,7 @@ export default {
   irreversible: 'Необратимый',
   wholeWord: 'Целое слово',
   save: 'Сохранить',
+  saving: 'Сохранение...',
   updatedFilter: 'Фильтр обновлён',
   createdFilter: 'Фильтр создан',
   failedToModifyFilter: 'Не удалось изменить фильтр: {error}',

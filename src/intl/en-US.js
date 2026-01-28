@@ -723,6 +723,7 @@ export default {
   irreversible: 'Irreversible',
   wholeWord: 'Whole word',
   save: 'Save',
+  saving: 'Saving...',
   updatedFilter: 'Updated filter',
   createdFilter: 'Created filter',
   failedToModifyFilter: 'Failed to modify filter: {error}',

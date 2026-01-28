@@ -448,6 +448,8 @@ export default {
   pushNotificationsNote: 'Beachte, dass Du nur für jeweils eine Instanz Push-Benachrichtigungen anzeigen lassen kannst.',
   pushSettings: 'Einstellungen für Push-Benachrichtigungen',
   savedPushSettings: 'Push-Benachrichtigungseinstellungen erfolgreich gespeichert',
+  save: 'Speichern',
+  saving: 'Speichern...',
   newFollowers: 'Neue Folgende',
   reblogs: 'Boosts',
   pollResults: 'Umfrageergebnisse',

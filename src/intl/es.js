@@ -669,6 +669,7 @@ export default {
   irreversible: 'Irreversible',
   wholeWord: 'Palabra completa',
   save: 'Guardar',
+  saving: 'Guardando...',
   updatedFilter: 'Filtro actualizado',
   createdFilter: 'Filtro creado',
   failedToModifyFilter: 'Fallo al modificar el filtro: {error}',
