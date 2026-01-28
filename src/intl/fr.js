@@ -455,6 +455,7 @@ export default {
   deniedPush: 'Vous avez désactivé les notifications push.',
   pushNotificationsNote: 'Veuillez noter que les notifications push ne peuvent être activées que pour une instance à la fois.',
   pushSettings: 'Paramètres de notifications push',
+  savedPushSettings: 'Paramètres de notifications push enregistrés avec succès',
   newFollowers: 'Suivants nouveaux',
   reblogs: 'Partages',
   pollResults: "Résultats d'enquête",

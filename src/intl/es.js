@@ -474,6 +474,7 @@ export default {
   subscriptions: 'Suscripción a toots',
   needToReauthenticate: 'Tienes que volver a autenticarte para habilitar las notificaciones Push. ¿Cerrr sesión en {instance}?',
   failedToUpdatePush: 'Se ha producido un fallo al actualizar las opciones para notificaciones Push: {error}',
+  savedPushSettings: 'Configuración de notificaciones Push guardada correctamente',
   // Themes
   chooseTheme: 'Elegir un diseño visual',
   darkBackground: 'Fondo oscuro',

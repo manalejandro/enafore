@@ -514,6 +514,7 @@ export default {
   subscriptions: 'Subscribed posts',
   needToReauthenticate: 'You need to reauthenticate in order to enable push notification. Log out of {instance}?',
   failedToUpdatePush: 'Failed to update push notification settings: {error}',
+  savedPushSettings: 'Push notification settings saved successfully',
   // Themes
   chooseTheme: 'Choose a theme',
   darkBackground: 'Dark background',

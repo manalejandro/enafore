@@ -468,6 +468,7 @@ export default {
   deniedPush: 'Вы запретили показывать уведомления.',
   pushNotificationsNote: 'Обратите внимание, что вы можете получать push-уведомления только для одного инстанса за раз.',
   pushSettings: 'Настройки push-уведомлений',
+  savedPushSettings: 'Настройки push-уведомлений успешно сохранены',
   newFollowers: 'Новые подписчики',
   reblogs: 'Продвижения',
   pollResults: 'Результаты опроса',

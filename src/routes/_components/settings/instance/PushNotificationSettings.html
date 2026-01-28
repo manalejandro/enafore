@@ -98,6 +98,7 @@
 
         try {
           await updateAlerts(instanceName, alerts)
+          toast.say(formatIntl('intl.savedPushSettings'))
         } catch (err) {
           e.target.checked = !e.target.checked
 

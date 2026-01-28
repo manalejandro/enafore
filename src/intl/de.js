@@ -447,6 +447,7 @@ export default {
   deniedPush: 'Du hast es abgelehnt, Push-Benachrichtigungen anzuzeigen.',
   pushNotificationsNote: 'Beachte, dass Du nur für jeweils eine Instanz Push-Benachrichtigungen anzeigen lassen kannst.',
   pushSettings: 'Einstellungen für Push-Benachrichtigungen',
+  savedPushSettings: 'Push-Benachrichtigungseinstellungen erfolgreich gespeichert',
   newFollowers: 'Neue Folgende',
   reblogs: 'Boosts',
   pollResults: 'Umfrageergebnisse',
