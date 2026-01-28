@@ -45,16 +45,38 @@ export class TimelineStream {
 
     ws.onopen = () => {
       if (!this._opened) {
+        console.log(`✓ WebSocket opened successfully for timeline: ${this._timeline}`)
         this.emit('open')
         this._opened = true
       } else {
         // we may close or reopen websockets due to freeze/unfreeze events
         // and we want to fire "reconnect" rather than "open" in that case
+        console.log(`✓ WebSocket reconnected successfully for timeline: ${this._timeline}`)
         this.emit('reconnect')
       }
     }
+    ws.onerror = (e) => {
+      console.error(`✗ WebSocket error for timeline ${this._timeline}:`, e)
+      // Note: The actual error details are typically in the close event
+    }
+    ws.onclose = (e) => {
+      const isAuthError = e.code === 1002 || e.code === 1006 || e.code === 1008 || e.code === 1011
+      const logFn = isAuthError ? console.error : console.log
+
+      logFn(`WebSocket closed for timeline ${this._timeline} - Code: ${e.code}, Reason: ${e.reason || 'none'}`)
+
+      if (isAuthError) {
+        console.error('⚠ Authentication error detected!')
+        console.error('Possible causes:')
+        console.error('  1. Access token is invalid or expired')
+        console.error('  2. Server streaming configuration issue')
+        console.error('  3. Token does not have required permissions')
+        console.error('Try logging out and logging back in to refresh your token.')
+      }
+
+      this.emit('close')
+    }
     ws.onmessage = (e) => this.emit('message', safeParse(e.data))
-    ws.onclose = () => this.emit('close')
     // The ws "onreconnect" event seems unreliable. When the server goes down and comes back up,
     // it doesn't fire (but "open" does). When we freeze and unfreeze, it fires along with the
     // "open" event. The above is my attempt to normalize it.

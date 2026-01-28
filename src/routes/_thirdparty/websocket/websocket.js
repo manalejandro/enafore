@@ -50,6 +50,17 @@ export class WebSocketClient {
    * @ignore
    */
   onCloseCallback (e) {
+    // Log WebSocket closure for debugging
+    if (e.code === 1002 || e.code === 1006 || e.code === 1008 || e.code === 1011) {
+      console.error('WebSocket closed with error code:', e.code, 'reason:', e.reason)
+      if (e.code === 1002 || e.code === 1008) {
+        console.error('This usually indicates an authentication error (401). Please check:')
+        console.error('1. Your access token is valid')
+        console.error('2. You have not been logged out')
+        console.error('3. The server streaming endpoint is working correctly')
+      }
+    }
+
     if (!this.isReconnect && this.listeners.onclose) {
       this.listeners.onclose.apply(null, arguments)
     }

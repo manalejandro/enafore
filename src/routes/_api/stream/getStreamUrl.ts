@@ -47,7 +47,21 @@ export function getStreamUrl(
 
   if (accessToken) {
     params.access_token = accessToken
+    console.log(`Building WebSocket URL for stream '${streamName}':`)
+    console.log(`  - API: ${streamingApi}`)
+    console.log(
+      `  - Token: ${accessToken.substring(0, 10)}...${accessToken.substring(accessToken.length - 4)} (${accessToken.length} chars)`,
+    )
+  } else {
+    console.warn(
+      'getStreamUrl: No access token provided - connection will likely fail',
+    )
   }
 
-  return url + '?' + paramsString(params)
+  const finalUrl = url + '?' + paramsString(params)
+  console.log(
+    `  - Full URL: ${finalUrl.replace(/access_token=[^&]+/, 'access_token=***')}`,
+  )
+
+  return finalUrl
 }

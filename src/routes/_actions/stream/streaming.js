@@ -2,10 +2,19 @@ import { TimelineStream } from '../../_api/stream/TimelineStream.js'
 import { processMessage } from './processMessage.js'
 import { fillStreamingGap } from './fillStreamingGap.js'
 import { store } from '../../_store/store.js'
+import { verifyStreamAccess } from '../../_api/stream/verifyStreamAccess.js'
 
 export function createStream (api, instanceName, accessToken, timelineName, firstStatusId, firstNotificationId) {
   console.log(`streaming ${instanceName} ${timelineName}: createStream`, 'firstStatusId', firstStatusId,
     'firstNotificationId', firstNotificationId)
+
+  // Verify token before attempting connection (async, but don't block)
+  verifyStreamAccess(api, accessToken).then(result => {
+    if (!result.valid) {
+      console.error(`⚠ Token verification failed: ${result.error}`)
+      console.error('The WebSocket connection may fail. Consider logging out and back in.')
+    }
+  })
 
   const fillGap = (timelineName, timelineItemId) => {
     if (timelineItemId) {
