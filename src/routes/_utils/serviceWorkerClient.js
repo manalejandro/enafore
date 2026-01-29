@@ -26,31 +26,25 @@ function onUpdateFound (registration) {
 
 if ('serviceWorker' in navigator) {
   console.log('[ServiceWorker] Attempting to register service worker...')
-
-  // First check if service-worker.js is accessible
-  fetch('/service-worker.js', { method: 'HEAD' })
-    .then(response => {
-      console.log('[ServiceWorker] /service-worker.js accessibility check:', {
-        status: response.status,
-        ok: response.ok,
-        statusText: response.statusText
-      })
-    })
-    .catch(err => {
-      console.error('[ServiceWorker] /service-worker.js not accessible:', err)
-    })
+  console.log('[ServiceWorker] Current location:', window.location.href)
+  console.log('[ServiceWorker] Document readyState:', document.readyState)
 
   // Wait for the page to be fully loaded before registering
   const registerServiceWorker = () => {
-    console.log('[ServiceWorker] Page loaded, starting registration')
+    console.log('[ServiceWorker] registerServiceWorker() called')
+    console.log('[ServiceWorker] Starting registration of /service-worker.js')
+
     navigator.serviceWorker.register('/service-worker.js')
       .then(registration => {
-        console.log('[ServiceWorker] Registration successful:', registration)
+        console.log('[ServiceWorker] ✓ Registration successful!', registration)
         console.log('[ServiceWorker] Scope:', registration.scope)
+        console.log('[ServiceWorker] Active:', registration.active)
+        console.log('[ServiceWorker] Installing:', registration.installing)
+        console.log('[ServiceWorker] Waiting:', registration.waiting)
         registration.addEventListener('updatefound', () => onUpdateFound(registration))
       })
       .catch(err => {
-        console.error('[ServiceWorker] Registration failed:', err)
+        console.error('[ServiceWorker] ✗ Registration failed:', err)
         console.error('[ServiceWorker] Error details:', {
           message: err.message,
           name: err.name,
@@ -59,14 +53,12 @@ if ('serviceWorker' in navigator) {
       })
   }
 
-  // Register immediately if already loaded, otherwise wait
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    console.log('[ServiceWorker] Document already ready, registering immediately')
+  // Register on next tick to ensure everything is loaded
+  console.log('[ServiceWorker] Scheduling registration...')
+  setTimeout(() => {
+    console.log('[ServiceWorker] Timeout fired, calling registerServiceWorker()')
     registerServiceWorker()
-  } else {
-    console.log('[ServiceWorker] Waiting for DOMContentLoaded')
-    window.addEventListener('load', registerServiceWorker)
-  }
+  }, 100)
 } else {
   console.error('[ServiceWorker] Service Worker API not supported in this browser')
 }
