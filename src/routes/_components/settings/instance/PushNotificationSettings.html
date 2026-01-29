@@ -115,14 +115,38 @@
             throw new Error('Service Worker not supported')
           }
 
-          // Add timeout to prevent hanging
-          const timeoutPromise = new Promise((_resolve, reject) => {
-            setTimeout(() => reject(new Error('Request timeout')), 30000)
+          // Check if push manager is available
+          if (!('PushManager' in window)) {
+            throw new Error('Push notifications not supported')
+          }
+
+          // Check notification permission
+          if (typeof window.Notification !== 'undefined' && window.Notification.permission === 'denied') {
+            throw new Error('Notification permission denied')
+          }
+
+          // Try to get service worker with timeout
+          const getServiceWorkerTimeout = new Promise((_resolve, reject) => {
+            setTimeout(() => reject(new Error('Service Worker not ready')), 5000)
+          })
+
+          const registration = await Promise.race([
+            navigator.serviceWorker.ready,
+            getServiceWorkerTimeout
+          ])
+
+          if (!registration || !registration.pushManager) {
+            throw new Error('Push Manager not available')
+          }
+
+          // Add timeout to prevent hanging on the update
+          const updateTimeout = new Promise((_resolve, reject) => {
+            setTimeout(() => reject(new Error('Request timeout')), 25000)
           })
 
           await Promise.race([
             updateAlerts(instanceName, alerts),
-            timeoutPromise
+            updateTimeout
           ])
 
           toast.say(formatIntl('intl.savedPushSettings'))
