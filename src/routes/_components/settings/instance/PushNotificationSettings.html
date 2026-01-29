@@ -110,7 +110,7 @@
         this.set({ saving: true })
 
         try {
-          // Check if service worker is available and active
+          // Check if service worker is available
           if (!('serviceWorker' in navigator)) {
             throw new Error('Service Worker not supported')
           }
@@ -125,15 +125,35 @@
             throw new Error('Notification permission denied')
           }
 
-          // Check if service worker is registered
-          const registration = await navigator.serviceWorker.getRegistration()
+          // Try to get service worker registration, wait if necessary
+          let registration = await navigator.serviceWorker.getRegistration()
+  
           if (!registration) {
-            throw new Error('Service Worker not registered. Push notifications require HTTPS or localhost.')
+            // Wait for registration with timeout
+            const registrationTimeout = new Promise((_resolve, reject) => {
+              setTimeout(() => reject(new Error('Service Worker not registered. Push notifications require HTTPS or localhost.')), 5000)
+            })
+  
+            registration = await Promise.race([
+              navigator.serviceWorker.ready,
+              registrationTimeout
+            ])
           }
 
-          // Check if service worker is active
+          if (!registration) {
+            throw new Error('Service Worker not available')
+          }
+
+          // If not active yet, wait a bit for it to activate
           if (!registration.active) {
-            throw new Error('Service Worker not active. Please reload the page.')
+            const activationTimeout = new Promise((_resolve, reject) => {
+              setTimeout(() => reject(new Error('Service Worker not active. Please reload the page.')), 5000)
+            })
+  
+            await Promise.race([
+              navigator.serviceWorker.ready,
+              activationTimeout
+            ])
           }
 
           // Now try to update with timeout
