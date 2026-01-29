@@ -22,7 +22,12 @@ function onUpdateFound (registration) {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js').then(registration => {
-    registration.addEventListener('updatefound', () => onUpdateFound(registration))
-  })
+  navigator.serviceWorker.register('/service-worker.js')
+    .then(registration => {
+      console.log('[ServiceWorker] Registration successful:', registration)
+      registration.addEventListener('updatefound', () => onUpdateFound(registration))
+    })
+    .catch(err => {
+      console.error('[ServiceWorker] Registration failed:', err)
+    })
 }

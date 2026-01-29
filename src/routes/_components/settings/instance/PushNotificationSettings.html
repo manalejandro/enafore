@@ -64,29 +64,48 @@
 
       // Check if service worker is registered or wait for it
       if ('serviceWorker' in navigator) {
+        console.log('[Push Settings] Checking for service worker...')
+
         // First check if already registered
         let registration = await navigator.serviceWorker.getRegistration()
-  
+        console.log('[Push Settings] Initial registration check:', registration)
+
         if (!registration) {
-          // Wait up to 3 seconds for registration to complete
+          console.log('[Push Settings] Waiting for service worker registration (up to 10 seconds)...')
+          // Wait up to 10 seconds for registration to complete
           try {
-            const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 3000))
+            const timeout = new Promise((resolve) => {
+              setTimeout(() => {
+                console.log('[Push Settings] Service worker registration timeout')
+                resolve(null)
+              }, 10000)
+            })
             registration = await Promise.race([
               navigator.serviceWorker.ready,
               timeout
             ])
+            console.log('[Push Settings] After waiting, registration:', registration)
           } catch (e) {
-            console.warn('Service Worker registration timeout:', e)
+            console.error('[Push Settings] Service Worker registration error:', e)
           }
         }
-  
-        this.set({ serviceWorkerRegistered: !!registration })
+
+        const isRegistered = !!registration
+        console.log('[Push Settings] Service worker registered:', isRegistered)
+
+        this.set({ serviceWorkerRegistered: isRegistered })
 
         if (!registration) {
-          console.warn('Service Worker not registered. Push notifications will not work.')
+          console.warn('[Push Settings] Service Worker not registered. Push notifications will not work.')
+          console.log('[Push Settings] Check DevTools > Application > Service Workers')
           return
         }
+
+        console.log('[Push Settings] Service worker active:', !!registration.active)
+        console.log('[Push Settings] Service worker installing:', !!registration.installing)
+        console.log('[Push Settings] Service worker waiting:', !!registration.waiting)
       } else {
+        console.error('[Push Settings] Service Worker API not supported')
         this.set({ serviceWorkerRegistered: false })
         return
       }
