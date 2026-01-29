@@ -3,8 +3,9 @@
     <p>{'intl.browserDoesNotSupportPush'}</p>
   {:elseif !serviceWorkerRegistered}
     <p role="alert">
-      Service Worker not registered. Push notifications are only available over HTTPS or on localhost.
-      Please check that the service worker is properly configured and reload the page.
+      Service Worker not ready. Push notifications require an active service worker.
+      Try reloading the page (Ctrl+Shift+R). If the issue persists, push notifications
+      may only work over HTTPS or localhost with a properly configured service worker.
     </p>
   {:elseif $notificationPermission === "denied"}
     <p role="alert">{'intl.deniedPush'}</p>
@@ -61,9 +62,24 @@
     async oncreate () {
       const { instanceName, options } = this.get()
 
-      // Check if service worker is registered
+      // Check if service worker is registered or wait for it
       if ('serviceWorker' in navigator) {
-        const registration = await navigator.serviceWorker.getRegistration()
+        // First check if already registered
+        let registration = await navigator.serviceWorker.getRegistration()
+  
+        if (!registration) {
+          // Wait up to 3 seconds for registration to complete
+          try {
+            const timeout = new Promise((resolve) => setTimeout(() => resolve(null), 3000))
+            registration = await Promise.race([
+              navigator.serviceWorker.ready,
+              timeout
+            ])
+          } catch (e) {
+            console.warn('Service Worker registration timeout:', e)
+          }
+        }
+  
         this.set({ serviceWorkerRegistered: !!registration })
 
         if (!registration) {
