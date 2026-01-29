@@ -127,7 +127,7 @@
 
           // Try to get service worker with timeout
           const getServiceWorkerTimeout = new Promise((_resolve, reject) => {
-            setTimeout(() => reject(new Error('Service Worker not ready')), 5000)
+            setTimeout(() => reject(new Error('Service Worker not ready')), 15000)
           })
 
           const registration = await Promise.race([
@@ -141,7 +141,7 @@
 
           // Add timeout to prevent hanging on the update
           const updateTimeout = new Promise((_resolve, reject) => {
-            setTimeout(() => reject(new Error('Request timeout')), 25000)
+            setTimeout(() => reject(new Error('Request timeout')), 30000)
           })
 
           await Promise.race([
