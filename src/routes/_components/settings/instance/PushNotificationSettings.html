@@ -1,13 +1,18 @@
 <div class="generic-instance-settings">
   {#if pushNotificationsSupport === false}
     <p>{'intl.browserDoesNotSupportPush'}</p>
+  {:elseif !serviceWorkerRegistered}
+    <p role="alert">
+      Service Worker not registered. Push notifications are only available over HTTPS or on localhost.
+      Please check that the service worker is properly configured and reload the page.
+    </p>
   {:elseif $notificationPermission === "denied"}
     <p role="alert">{'intl.deniedPush'}</p>
   {:elseif $loggedInInstancesInOrder.length > 1}
     <p>{'intl.pushNotificationsNote'}</p>
   {/if}
   <form id="push-notification-settings"
-        disabled="{!pushNotificationsSupport}"
+        disabled="{!pushNotificationsSupport || !serviceWorkerRegistered}"
         ref:form
         aria-label="{'intl.pushSettings'}">
     {#each options as option, i (option.key)}
@@ -17,13 +22,13 @@
       <input type="checkbox"
              id="push-notifications-{option.key}"
              name="{option.key}"
-             disabled="{!pushNotificationsSupport}">
+             disabled="{!pushNotificationsSupport || !serviceWorkerRegistered}">
       <label for="push-notifications-{option.key}">{option.label}</label>
     {/each}
     <div class="save-button-wrapper">
       <button type="button"
               class="primary"
-              disabled="{!pushNotificationsSupport || saving}"
+              disabled="{!pushNotificationsSupport || !serviceWorkerRegistered || saving}"
               on:click="onSaveClick()">
         {saving ? 'intl.saving' : 'intl.save'}
       </button>
@@ -55,6 +60,21 @@
   export default {
     async oncreate () {
       const { instanceName, options } = this.get()
+
+      // Check if service worker is registered
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration()
+        this.set({ serviceWorkerRegistered: !!registration })
+
+        if (!registration) {
+          console.warn('Service Worker not registered. Push notifications will not work.')
+          return
+        }
+      } else {
+        this.set({ serviceWorkerRegistered: false })
+        return
+      }
+
       await updatePushSubscriptionForInstance(instanceName)
 
       const { form } = this.refs
@@ -67,6 +87,7 @@
     store: () => store,
     data: () => ({
       saving: false,
+      serviceWorkerRegistered: false,
       options: [
         {
           key: 'follow',
@@ -110,53 +131,7 @@
         this.set({ saving: true })
 
         try {
-          // Check if service worker is available
-          if (!('serviceWorker' in navigator)) {
-            throw new Error('Service Worker not supported')
-          }
-
-          // Check if push manager is available
-          if (!('PushManager' in window)) {
-            throw new Error('Push notifications not supported')
-          }
-
-          // Check notification permission
-          if (typeof window.Notification !== 'undefined' && window.Notification.permission === 'denied') {
-            throw new Error('Notification permission denied')
-          }
-
-          // Try to get service worker registration, wait if necessary
-          let registration = await navigator.serviceWorker.getRegistration()
-  
-          if (!registration) {
-            // Wait for registration with timeout
-            const registrationTimeout = new Promise((_resolve, reject) => {
-              setTimeout(() => reject(new Error('Service Worker not registered. Push notifications require HTTPS or localhost.')), 5000)
-            })
-  
-            registration = await Promise.race([
-              navigator.serviceWorker.ready,
-              registrationTimeout
-            ])
-          }
-
-          if (!registration) {
-            throw new Error('Service Worker not available')
-          }
-
-          // If not active yet, wait a bit for it to activate
-          if (!registration.active) {
-            const activationTimeout = new Promise((_resolve, reject) => {
-              setTimeout(() => reject(new Error('Service Worker not active. Please reload the page.')), 5000)
-            })
-  
-            await Promise.race([
-              navigator.serviceWorker.ready,
-              activationTimeout
-            ])
-          }
-
-          // Now try to update with timeout
+          // Add timeout to prevent hanging
           const updateTimeout = new Promise((_resolve, reject) => {
             setTimeout(() => reject(new Error('Request timeout. The server may be unreachable.')), 30000)
           })
