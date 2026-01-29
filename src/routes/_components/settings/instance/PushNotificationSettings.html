@@ -110,11 +110,26 @@
         this.set({ saving: true })
 
         try {
-          await updateAlerts(instanceName, alerts)
+          // Check if service worker is available
+          if (!('serviceWorker' in navigator)) {
+            throw new Error('Service Worker not supported')
+          }
+
+          // Add timeout to prevent hanging
+          const timeoutPromise = new Promise((_resolve, reject) => {
+            setTimeout(() => reject(new Error('Request timeout')), 30000)
+          })
+
+          await Promise.race([
+            updateAlerts(instanceName, alerts),
+            timeoutPromise
+          ])
+
           toast.say(formatIntl('intl.savedPushSettings'))
         } catch (err) {
+          console.error('Push notification settings error:', err)
           // TODO: Better way to detect missing authorization scope
-          if (err.message.startsWith('403:')) {
+          if (err.message && err.message.startsWith('403:')) {
             const showTextConfirmationDialog = await importShowTextConfirmationDialog()
             showTextConfirmationDialog({
               text: formatIntl('intl.needToReauthenticate', { instance: instanceName })
@@ -123,7 +138,7 @@
             })
           } else {
             toast.say(formatIntl('intl.failedToUpdatePush', {
-              error: err.message || ''
+              error: err.message || err.toString()
             }))
           }
         } finally {
