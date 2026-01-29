@@ -1,7 +1,9 @@
-import { snackbar } from '../_components/snackbar/snackbar.js'
-
+// Service Worker Registration
+console.log('[ServiceWorker] ===== MODULE EXECUTING =====')
 console.log('[ServiceWorker] Client script loaded')
 console.log('[ServiceWorker] Service Worker support:', 'serviceWorker' in navigator)
+console.log('[ServiceWorker] Navigator:', typeof navigator)
+console.log('[ServiceWorker] Window:', typeof window)
 
 async function skipWaiting () {
   const reg = await navigator.serviceWorker.getRegistration()
@@ -16,10 +18,12 @@ function onUpdateFound (registration) {
 
   newWorker.addEventListener('statechange', async () => {
     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-      snackbar.announce('intl.updateAvailable', 'intl.reload', async () => {
+      console.log('[ServiceWorker] Update available')
+      // Show update notification
+      if (window.confirm('A new version is available. Reload to update?')) {
         await skipWaiting()
         document.location.reload(true)
-      })
+      }
     }
   })
 }
