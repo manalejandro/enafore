@@ -25,9 +25,13 @@ const defaultLanguage = process.env.LOCALE.split('-')[0]
 export function translateStatus (
   status,
   currentInstance,
-  to = defaultLanguage,
+  to,
   from = 'auto'
 ) {
+  if (to === undefined || to === null) {
+    const { nativeLanguage } = store.get()
+    to = nativeLanguage || defaultLanguage
+  }
   const id = currentInstance + '-' + status.id
   const {
     statusTranslations,

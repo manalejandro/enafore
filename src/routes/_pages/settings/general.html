@@ -214,6 +214,17 @@
              on:input="onLibreTranslateApiKeyInput(event)"
       />
     {/if}
+
+    <label class="setting-group" for="native-language">
+      {'intl.nativeLanguage'}
+    </label>
+    <input id="native-language"
+           type="text"
+           class="setting-text-input"
+           placeholder="{'intl.nativeLanguagePlaceholder'}"
+           value={$nativeLanguage}
+           on:input="onNativeLanguageInput(event)"
+    />
   </form>
 </SettingsLayout>
 <UISettingsStyles />
@@ -306,6 +317,10 @@
       },
       onLibreTranslateApiKeyInput (event) {
         this.store.set({ libreTranslateApiKey: event.target.value.trim() })
+        this.store.save()
+      },
+      onNativeLanguageInput (event) {
+        this.store.set({ nativeLanguage: event.target.value.trim().toLowerCase() })
         this.store.save()
       }
     },

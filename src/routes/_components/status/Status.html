@@ -34,6 +34,13 @@
   {#if !nextGrouped && showTranslate}
     <StatusTranslateToolbar {translateContent} {translateState}/>
   {/if}
+  {#if !nextGrouped && canTranslate}
+    <div class="status-translate-link-area">
+      <button class="status-translate-link" on:click="doTranslate()">
+        {'intl.translatePost'}
+      </button>
+    </div>
+  {/if}
   <!-- Apparently it's possible for spoilered content to sometimes have embeds, but I can't figure out how.
        Don't bother optimizing this with the preloadHiddenContent. -->
   {#if !nextGrouped && showCard && showContent}
@@ -165,6 +172,22 @@
   .status-article.notification-next-grouped :global(.status-header) {
     margin-bottom: 0;
   }
+  .status-translate-link-area {
+    grid-area: translate;
+    padding: 4px 10px 4px 5px;
+  }
+  .status-translate-link {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--anchor-text);
+    font-size: 1.1em;
+    text-decoration: underline;
+  }
+  .status-translate-link:hover {
+    text-decoration: none;
+  }
 </style>
 <script>
   import StatusSidebar from './StatusSidebar.html'
@@ -198,6 +221,7 @@
   import { LONG_POST_LENGTH, LONG_POST_TEXT } from '../../_static/statuses.js'
   import { absoluteDateFormatter, dayOnlyAbsoluteDateFormatter } from '../../_utils/formatters.js'
   import { composeNewStatusMentioning } from '../../_actions/mention.js'
+  import { translateStatus } from '../../_actions/translate.js'
   import { createStatusOrNotificationUuid } from '../../_utils/createStatusOrNotificationUuid.js'
   import { addEmojiTooltips } from '../../_utils/addEmojiTooltips.js'
   import { tryToFocusElement } from '../../_utils/tryToFocusElement.js'
@@ -322,6 +346,11 @@
       },
       recalculateHeight () {
         this.fire('recalculateHeight')
+      },
+      doTranslate () {
+        const { originalStatus } = this.get()
+        const { currentInstance } = this.store.get()
+        translateStatus(originalStatus, currentInstance)
       }
     },
     computed: {
@@ -481,6 +510,14 @@
         return $statusTranslations[translateKey]
       },
       showTranslate: ({ translateState }) => !!(translateState && translateState.show),
+      statusLanguage: ({ originalStatus }) => originalStatus.language,
+      canTranslate: ({ statusLanguage, $nativeLanguage, showTranslate, isStatusInNotification }) => {
+        if (isStatusInNotification) return false
+        if (showTranslate) return false
+        if (!statusLanguage) return false
+        const userLang = ($nativeLanguage || process.env.LOCALE || 'en').split('-')[0].toLowerCase()
+        return statusLanguage.toLowerCase() !== userLang
+      },
       translateContent: ({ $statusTranslationContents, translateKey }) => {
         const tc = $statusTranslationContents[translateKey]
         if (!tc) return null

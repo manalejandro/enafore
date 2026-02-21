@@ -61,7 +61,8 @@ const persistedState = {
   // Translation settings
   translationEngine: 'google', // 'google' | 'libretranslate'
   libreTranslateUrl: '',
-  libreTranslateApiKey: ''
+  libreTranslateApiKey: '',
+  nativeLanguage: ''
 }
 
 const nonPersistedState = {

@@ -300,6 +300,7 @@ export default {
   deleteAndRedraft: 'Delete and redraft',
   reportStatus: 'Report post',
   translateStatus: 'Translate post',
+  translatePost: 'Translate',
   translated: `Translated post from {from}{detected, select,
     true { - Detected}
     other {}
@@ -316,6 +317,8 @@ export default {
   libreTranslateUrlPlaceholder: 'https://libretranslate.com',
   libreTranslateApiKey: 'LibreTranslate API key (optional)',
   libreTranslateApiKeyPlaceholder: 'Leave empty if not required',
+  nativeLanguage: 'Native language (for auto-translate)',
+  nativeLanguagePlaceholder: 'e.g. es, en, fr, de',
   reactToStatus: 'React to post',
   quoteStatus: 'Quote post',
   shareStatus: 'Share post',

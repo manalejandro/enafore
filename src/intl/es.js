@@ -288,6 +288,26 @@ export default {
   unbookmarkStatus: 'Quitar marcador al toot',
   deleteAndRedraft: 'Borrar y volver a redactar',
   reportStatus: 'Denunciar toot',
+  translateStatus: 'Traducir toot',
+  translatePost: 'Traducir',
+  translated: `Toot traducido desde {from}{detected, select,
+    true { - Detectado}
+    other {}
+  }`,
+  translateError: 'Hubo un error al traducir este toot',
+  translating: 'Traduciendo...',
+  hideTranslation: 'Ocultar traducción',
+  // Translation settings
+  translationSettings: 'Traducción',
+  translationEngine: 'Motor de traducción',
+  translationEngineGoogle: 'Google Translate (vía SimplyTranslate)',
+  translationEngineLibreTranslate: 'LibreTranslate',
+  libreTranslateUrl: 'URL del servidor LibreTranslate',
+  libreTranslateUrlPlaceholder: 'https://libretranslate.com',
+  libreTranslateApiKey: 'Clave API de LibreTranslate (opcional)',
+  libreTranslateApiKeyPlaceholder: 'Dejar vacío si no es necesario',
+  nativeLanguage: 'Idioma nativo (para autotraducción)',
+  nativeLanguagePlaceholder: 'Ej: es, en, fr, de',
   shareStatus: 'Compartir toot',
   copyLinkToStatus: 'Copiar enlace al toot',
   // Account profile
