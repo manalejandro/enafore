@@ -57,7 +57,11 @@ const persistedState = {
     !ENAFORE_IS_BROWSER || matchMedia('(prefers-reduced-motion: reduce)').matches,
   underlineLinks: false,
   iconColors: '',
-  lastContentTypes: {}
+  lastContentTypes: {},
+  // Translation settings
+  translationEngine: 'google', // 'google' | 'libretranslate'
+  libreTranslateUrl: '',
+  libreTranslateApiKey: ''
 }
 
 const nonPersistedState = {

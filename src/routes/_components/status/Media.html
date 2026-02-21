@@ -10,29 +10,44 @@
       <FileIcon />
   </button>
 {:else}
-  {#if !blurhash && (type === 'video' || type === 'audio')}
+  {#if !blurhash && type === 'audio'}
+    <div class="inline-media inline-audio-player"
+         data-width={inlineWidth}
+         data-height={inlineHeight}>
+      {#if description}
+        <span class="audio-description">{description}</span>
+      {/if}
+      <!-- svelte-ignore a11y-media-has-caption -->
+      <audio controls
+             class="audio-element"
+             src={url}
+             preload="metadata"
+             aria-label={videoOrAudioButtonLabel}
+             tabindex={tabindex}
+             aria-hidden={ariaHidden}>
+      </audio>
+    </div>
+  {:elseif !blurhash && type === 'video'}
     <button id={elementId}
             type="button"
-            class="inline-media play-video-button focus-after {type === 'audio' ? 'play-audio-button' : ''} {noNativeWidthHeight ? 'no-native-width-height' : ''}"
+            class="inline-media play-video-button focus-after {noNativeWidthHeight ? 'no-native-width-height' : ''}"
             aria-label={videoOrAudioButtonLabel}
             {tabindex}
             aria-hidden={ariaHidden}
             data-width={inlineWidth}
             data-height={inlineHeight}>
       <PlayVideoIcon />
-      {#if type === 'video'}
-        <LazyImage
-          alt={description}
-          title={description}
-          src={previewUrl}
-          fallback={oneTransparentPixel}
-          {blurhash}
-          width={inlineWidth}
-          height={inlineHeight}
-          background="var(--loading-bg)"
-          {focus}
-        />
-      {/if}
+      <LazyImage
+        alt={description}
+        title={description}
+        src={previewUrl}
+        fallback={oneTransparentPixel}
+        {blurhash}
+        width={inlineWidth}
+        height={inlineHeight}
+        background="var(--loading-bg)"
+        {focus}
+      />
     </button>
   {:else}
     <button id={elementId}
@@ -101,10 +116,6 @@
     background: var(--mask-bg);
   }
 
-  .play-audio-button {
-    background: var(--audio-bg);
-  }
-
   .show-image-button {
     cursor: zoom-in;
   }
@@ -113,6 +124,29 @@
     position: relative;
     width: 100%;
     height: 100%;
+  }
+
+  .inline-audio-player {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 8px;
+    background: var(--audio-bg);
+    border-radius: 6px;
+    gap: 6px;
+    height: auto;
+    min-height: 56px;
+  }
+
+  .audio-description {
+    font-size: 0.9em;
+    color: var(--deemphasized-text-color);
+    word-break: break-word;
+  }
+
+  .audio-element {
+    width: 100%;
+    min-width: 200px;
   }
 
   :global(.no-native-width-height img, .no-native-width-height video){
@@ -134,8 +168,11 @@
 
 export default {
     async oncreate () {
-      const { elementId } = this.get()
-      registerClickDelegate(this, elementId, () => this.onClick())
+      const { elementId, type } = this.get()
+      // Audio has an inline player, no click-to-open-dialog needed
+      if (type !== 'audio') {
+        registerClickDelegate(this, elementId, () => this.onClick())
+      }
     },
     computed: {
       focus: ({ meta }) => meta && meta.focus,

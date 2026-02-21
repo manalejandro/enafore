@@ -14,6 +14,7 @@ import { addStatusesOrNotifications } from './addStatusOrNotification.js'
 import { scheduleIdleTask } from '../_utils/scheduleIdleTask.js'
 import { sortItemSummariesForThread, sortItemSummariesForNotificationBatch } from '../_utils/sortItemSummaries.ts'
 import { rehydrateStatusOrNotification } from './rehydrateStatusOrNotification.js'
+import { fillStreamingGap } from './stream/fillStreamingGap.js'
 import li from 'li'
 
 async function storeFreshTimelineItemsInDatabase (instanceName, timelineName, items) {
@@ -218,19 +219,38 @@ export async function setupTimeline () {
   console.log('setupTimeline')
   mark('setupTimeline')
   // If we don't have any item summaries, or if the current item summaries are stale
-  // (i.e. via offline mode), then we need to re-fetch
+  // (i.e. via offline mode), then we need to re-fetch.
   // Also do this if it's a thread, because threads change pretty frequently and
   // we don't have a good way to update them.
   const {
     timelineItemSummaries,
     timelineItemSummariesAreStale,
-    currentTimeline
+    currentTimeline,
+    currentInstance,
+    accessToken,
+    online
   } = store.get()
   console.log({ timelineItemSummaries, timelineItemSummariesAreStale, currentTimeline })
   if (!timelineItemSummaries ||
     timelineItemSummariesAreStale ||
     currentTimeline.startsWith('status/')) {
     await fetchTimelineItemsAndPossiblyFallBack()
+  } else if (online &&
+    !currentTimeline.startsWith('favorites') &&
+    !currentTimeline.startsWith('bookmarks')) {
+    // The cache is warm but may be stale. Do a background gap-fill to pick up
+    // any posts that arrived while the WebSocket was disconnected (e.g. the tab
+    // was suspended / backgrounded). This runs without blocking the UI.
+    const firstId = store.getFirstTimelineItemId(currentInstance, currentTimeline)
+    if (firstId) {
+      scheduleIdleTask(async () => {
+        try {
+          await fillStreamingGap(currentInstance, accessToken, currentTimeline, firstId)
+        } catch (e) {
+          console.warn('background gap-fill failed', e)
+        }
+      })
+    }
   }
   stop('setupTimeline')
 }

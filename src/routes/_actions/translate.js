@@ -1,11 +1,26 @@
 import { importGoogleTranslate } from '../_utils/asyncModules/importGoogleTranslate.js'
+import { importLibreTranslate } from '../_utils/asyncModules/importLibreTranslate.js'
 import { store } from '../_store/store.js'
 import escapeHtml from 'escape-html'
 import { renderPostHTML } from '../_utils/renderPostHTML.ts'
-async function translate (html, to, from) {
+
+async function translateWithEngine (html, to, from) {
+  const { translationEngine, libreTranslateUrl, libreTranslateApiKey } = store.get()
+
+  if (translationEngine === 'libretranslate' && libreTranslateUrl) {
+    const { buildLibreTranslate } = await importLibreTranslate()
+    const engine = buildLibreTranslate(libreTranslateUrl, libreTranslateApiKey || '')
+    return {
+      content: await engine.translate(html, to, from),
+      sourceLanguageNames: engine.sourceLanguageNames
+    }
+  }
+
+  // Default: Google Translate via SimplyTranslate proxy
   const { sourceLanguageNames, translate } = await importGoogleTranslate()
   return { content: await translate(html, to, from), sourceLanguageNames }
 }
+
 const defaultLanguage = process.env.LOCALE.split('-')[0]
 export function translateStatus (
   status,
@@ -39,7 +54,7 @@ export function translateStatus (
         emojis.set(emoji.shortcode, emoji)
       }
     }
-    translate(
+    translateWithEngine(
       (status.spoiler_text
         ? renderPostHTML({
           content: '<span class="spoiler_text">' +

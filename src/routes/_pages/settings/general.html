@@ -179,14 +179,64 @@
     <h2>{themeTitle}</h2>
     <ThemeSettings instanceName={$currentInstance} />
   {/if}
+
+  <h2 id="section-translation">{'intl.translationSettings'}</h2>
+  <form class="ui-settings">
+    <label class="setting-group" for="choice-translation-engine">
+      {'intl.translationEngine'}
+    </label>
+    <Select id="choice-translation-engine"
+            options={translationEngineOptions}
+            defaultValue={$translationEngine}
+            label="{'intl.translationEngine'}"
+            on:change="onTranslationEngineChange(event)" />
+
+    {#if $translationEngine === 'libretranslate'}
+      <label class="setting-group" for="libretranslate-url">
+        {'intl.libreTranslateUrl'}
+      </label>
+      <input id="libretranslate-url"
+             type="url"
+             class="setting-text-input"
+             placeholder="{'intl.libreTranslateUrlPlaceholder'}"
+             value={$libreTranslateUrl}
+             on:input="onLibreTranslateUrlInput(event)"
+      />
+
+      <label class="setting-group" for="libretranslate-api-key">
+        {'intl.libreTranslateApiKey'}
+      </label>
+      <input id="libretranslate-api-key"
+             type="password"
+             class="setting-text-input"
+             placeholder="{'intl.libreTranslateApiKeyPlaceholder'}"
+             value={$libreTranslateApiKey}
+             on:input="onLibreTranslateApiKeyInput(event)"
+      />
+    {/if}
+  </form>
 </SettingsLayout>
 <UISettingsStyles />
+<style>
+  .setting-text-input {
+    width: 100%;
+    max-width: 420px;
+    padding: 6px 10px;
+    margin: 4px 0 12px 0;
+    border: 1px solid var(--main-border);
+    border-radius: 4px;
+    background: var(--input-bg);
+    color: var(--main-text-color);
+    font-size: 1em;
+  }
+</style>
 <script>
   import SettingsLayout from '../../_components/settings/SettingsLayout.html'
   import ThemeSettings from '../../_components/settings/instance/ThemeSettings.html'
   import { store } from '../../_store/store.js'
   import Tooltip from '../../_components/Tooltip.html'
   import UISettingsStyles from '../../_components/settings/UISettingsStyles.html'
+  import Select from '../../_components/Select.html'
   import { formatIntl } from '../../_utils/formatIntl.js'
 
   export default {
@@ -197,7 +247,8 @@
       SettingsLayout,
       ThemeSettings,
       Tooltip,
-      UISettingsStyles
+      UISettingsStyles,
+      Select
     },
     methods: {
 
@@ -244,6 +295,18 @@
           }
         }
         this.store.save()
+      },
+      onTranslationEngineChange (event) {
+        this.store.set({ translationEngine: event.target.value })
+        this.store.save()
+      },
+      onLibreTranslateUrlInput (event) {
+        this.store.set({ libreTranslateUrl: event.target.value.trim() })
+        this.store.save()
+      },
+      onLibreTranslateApiKeyInput (event) {
+        this.store.set({ libreTranslateApiKey: event.target.value.trim() })
+        this.store.save()
       }
     },
     store: () => store,
@@ -255,7 +318,11 @@
       )
     },
     data: () => ({
-      singleInstance: process.env.SINGLE_INSTANCE
+      singleInstance: process.env.SINGLE_INSTANCE,
+      translationEngineOptions: [
+        { value: 'google', label: 'intl.translationEngineGoogle' },
+        { value: 'libretranslate', label: 'intl.translationEngineLibreTranslate' }
+      ]
     })
   }
 </script>

@@ -307,6 +307,15 @@ export default {
   translateError: 'There was an error translating this post',
   translating: 'Translating...',
   hideTranslation: 'Hide translation',
+  // Translation settings
+  translationSettings: 'Translation',
+  translationEngine: 'Translation engine',
+  translationEngineGoogle: 'Google Translate (via SimplyTranslate)',
+  translationEngineLibreTranslate: 'LibreTranslate',
+  libreTranslateUrl: 'LibreTranslate server URL',
+  libreTranslateUrlPlaceholder: 'https://libretranslate.com',
+  libreTranslateApiKey: 'LibreTranslate API key (optional)',
+  libreTranslateApiKeyPlaceholder: 'Leave empty if not required',
   reactToStatus: 'React to post',
   quoteStatus: 'Quote post',
   shareStatus: 'Share post',
@@ -371,7 +380,8 @@ export default {
   </p>
 
   <p>
-    Post translation is powered by Google Translate via <a href="https://simplytranslate.org">SimplyTranslate.org</a>.
+    Post translation is powered by Google Translate via <a href="https://simplytranslate.org">SimplyTranslate.org</a> by default,
+    or by <a href="https://libretranslate.com">LibreTranslate</a> when configured in Settings → General.
   </p>
 
   <h2>Credits</h2>
