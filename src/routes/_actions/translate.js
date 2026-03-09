@@ -33,9 +33,7 @@ export function translateStatus (
     to = nativeLanguage || defaultLanguage
   }
   if (from === undefined || from === null) {
-    from = status.language ||
-      (status.account && status.account.source && status.account.source.language) ||
-      'auto'
+    from = status.language || 'auto'
   }
   const id = currentInstance + '-' + status.id
   const {
