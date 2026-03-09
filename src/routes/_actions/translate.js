@@ -26,11 +26,16 @@ export function translateStatus (
   status,
   currentInstance,
   to,
-  from = 'auto'
+  from
 ) {
   if (to === undefined || to === null) {
     const { nativeLanguage } = store.get()
     to = nativeLanguage || defaultLanguage
+  }
+  if (from === undefined || from === null) {
+    from = status.language ||
+      (status.account && status.account.source && status.account.source.language) ||
+      'auto'
   }
   const id = currentInstance + '-' + status.id
   const {

@@ -28,3 +28,4 @@
 .now
 .vercel
 /webpack/*.cjs
+.pnpm-store
